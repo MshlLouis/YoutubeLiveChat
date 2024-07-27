@@ -2,19 +2,18 @@ import com.github.kusaanko.youtubelivechat.ChatItem;
 import com.github.kusaanko.youtubelivechat.ChatItemDelete;
 import com.github.kusaanko.youtubelivechat.IdType;
 import com.github.kusaanko.youtubelivechat.YouTubeLiveChat;
-import com.sun.jdi.ThreadReference;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
-import java.util.Date;
+import java.util.ArrayList;
 
 public class ChannelThread implements Runnable {
 
     String channelName;
     Connection c;
     int updateTimer;
-    boolean switchedStatus = false;
 
     public ChannelThread(String channelName, Connection c, int updateTimer) {
         this.channelName = channelName;
@@ -34,13 +33,16 @@ public class ChannelThread implements Runnable {
     public void getMessages() throws IOException, InterruptedException, SQLException {
 
         String channelID = YouTubeLiveChat.getChannelIdFromURL("https://www.youtube.com/@" +channelName);
+        boolean isLiveB = isLive(channelID);
+        boolean switchedStatus = false;
         YouTubeLiveChat chat = null;
 
         while (true) {
-            if(!isLive(channelID)) {
+            if(!isLiveB) {
                 switchedStatus = false;
-            //    System.out.println("Channel " +channelName +" is not live.");
+          //      System.out.println("Channel " +channelName +" is not live.");
                 Thread.sleep(60000);
+                isLiveB = isLive(channelID);
             }
             else {
                 if(!switchedStatus) {
@@ -52,16 +54,18 @@ public class ChannelThread implements Runnable {
                 else {
                     try {
                         chat.update();
+
                         for (ChatItem item : chat.getChatItems()) {
-                        //    System.out.println(chat.getChannelId() +" " + mySQLFile.format.format(new Date(item.getTimestamp() / 1000)) + " " + item.getType() + "[" + item.getAuthorName() + "] " +item.getAuthorChannelID() +" " + item.getAuthorType() + " " + item.getMessage() );
+                            //       System.out.println(chat.getChannelId() +" " + mySQLFile.format.format(new Date(item.getTimestamp() / 1000)) + " " + item.getType() + "[" + item.getAuthorName() + "] " +item.getAuthorChannelID() +" " + item.getAuthorType() + " " + item.getMessage() );
                             mySQLFile.insertData(c, item, channelID, channelName);
                             mySQLFile.insertDataIDs(c, item);
                         }
-//            for (ChatItemDelete delete : chat.getChatItemDeletes()) {
-//                System.out.println(delete.getMessage() + " TargetId:" + delete.getTargetId());
-//            }
+//                        for (ChatItemDelete delete : chat.getChatItemDeletes()) {
+//                            System.out.println(delete.getMessage() + " TargetId:" + delete.getTargetId());
+//                        }
                     }  catch (Exception e) {
-                        e.printStackTrace();
+                   //     System.out.println("Channel " +channelName +" just went offline!");
+                        isLiveB = isLive(channelID);
                     }
                     Thread.sleep(updateTimer*1000L);
                 }
