@@ -1,0 +1,4 @@
+[channelname],[update time in seconds]
+[channelname],[update time in seconds]
+[channelname],[update time in seconds]
+[channelname],[update time in seconds]
