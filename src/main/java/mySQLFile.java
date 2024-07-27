@@ -95,7 +95,6 @@ public class mySQLFile {
         mainFile.setCredentials();
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             c = DriverManager
                     .getConnection("jdbc:mariadb://"+mainFile.databaseURL,
                             mainFile.databaseUsername,mainFile.databasePassword);
