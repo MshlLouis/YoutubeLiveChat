@@ -1,9 +1,9 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,7 +35,7 @@ public class mainFile {
 
     public static void main(String[] args) {
 
-        try {
+        /*try {
             setCredentials();
             Class.forName("com.mysql.cj.jdbc.Driver");
             c = DriverManager
@@ -46,13 +46,26 @@ public class mainFile {
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
+        }*/
+
+        HashMap<String,Integer> channels = new HashMap<>();
+
+        try (FileInputStream fis = new FileInputStream("channels.txt");
+             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+             BufferedReader br = new BufferedReader(isr)) {
+
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String [] split = line.split(",");
+                channels.put(split[0],Integer.parseInt(split[1]));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        String [] channels = {"Wynnsanity","DesiArmyy","satvik"};
-        ExecutorService service = Executors.newFixedThreadPool(channels.length);
+        ExecutorService service = Executors.newFixedThreadPool(channels.size());
+        channels.forEach((channelname,timer) -> service.submit(new ChannelThread(channelname,c,timer)));
 
-        for (String s : channels) {
-            service.submit(new ChannelThread(s,c));
-        }
     }
 }
