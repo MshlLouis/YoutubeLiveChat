@@ -30,11 +30,11 @@ public class mySQLFile {
 
     public static void createIDTable(Connection c, Statement stmt) throws SQLException {
         stmt = c.createStatement();
-        String sql = "CREATE TABLE userids" +
-                " (USERID  INT PRIMARY KEY  NOT NULL," +
-                " NAME           CHAR(100)  NOT NULL) " +
+        String sql = "CREATE TABLE useridsYT" +
+                " (USERID        CHAR(30) PRIMARY KEY  NOT NULL," +
+                " NAME           TEXT                  NOT NULL) " +
                 " CHARACTER SET  utf8mb4" +
-                " COLLATE        utf8mb4_general_ci";
+                " COLLATE        utf8mb4_unicode_520_ci";
         stmt.executeUpdate(sql);
         stmt.close();
     }
@@ -48,9 +48,6 @@ public class mySQLFile {
         String date = format.format(new Date(item.getTimestamp() / 1000));
         String msg = item.getMessage();
 
-        //    System.out.println(user.getUsers().get(0).getBroadcasterType());
-        //    System.out.println(user.getUsers().get(0).getType());
-
         String sql = "INSERT INTO ChatYoutube (USERID,USERNAME,CHANNELID,CHANNELNAME,MESSAGETYPE,AUTHORTYPE,DATE,MESSAGE) VALUES (?,?,?,?,?,?,?,?);";
         try (PreparedStatement pstmt = c.prepareStatement(sql);) {
             pstmt.setString(1, userID);
@@ -63,6 +60,24 @@ public class mySQLFile {
             pstmt.setBytes(8, msg.getBytes(StandardCharsets.UTF_8));
 
             pstmt.executeUpdate();
+        }
+        c.commit();
+    }
+
+    public static void insertDataIDs(Connection c, ChatItem item) throws SQLException {
+
+        String userID = item.getAuthorChannelID();
+        String userName = item.getAuthorName();
+
+        String sql = "INSERT INTO useridsYT" +" (USERID,NAME) VALUES (?,?);";
+        try (PreparedStatement pstmt = c.prepareStatement(sql);) {
+            pstmt.setString(1, userID);
+            pstmt.setBytes(2, userName.getBytes(StandardCharsets.UTF_8));
+
+            pstmt.executeUpdate();
+        }
+        catch (Exception ignored) {
+
         }
         c.commit();
     }
@@ -89,7 +104,7 @@ public class mySQLFile {
 
         Connection c = establishConnection();
         createMainTable(c, null, "ChatYoutube");
-  //      createIDTable(c, null);
+        createIDTable(c, null);
 
     }
 }
