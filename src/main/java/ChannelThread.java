@@ -37,6 +37,7 @@ public class ChannelThread implements Runnable {
         boolean switchedStatus = false;
         YouTubeLiveChat chat = null;
 
+
         while (true) {
             if(!isLiveB) {
                 switchedStatus = false;
@@ -53,6 +54,9 @@ public class ChannelThread implements Runnable {
                 }
                 else {
                     try {
+                        if(!chat.getBroadcastInfo().isLiveNow) {
+                            isLiveB = false;
+                        }
                         chat.update();
 
                         for (ChatItem item : chat.getChatItems()) {
