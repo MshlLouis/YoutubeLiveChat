@@ -1,14 +1,11 @@
 import com.github.kusaanko.youtubelivechat.ChatItem;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 
 public class mySQLFile {
 
@@ -21,10 +18,12 @@ public class mySQLFile {
                 " USERNAME       TEXT       NOT NULL, " +
                 " CHANNELID      CHAR(30)   NOT NULL, " +
                 " CHANNELNAME    TEXT       NOT NULL, " +
+                " MESSAGETYPE    TEXT       NOT NULL, " +
+                " AUTHORTYPE     TEXT       NOT NULL, " +
                 " DATE           CHAR(30)   NOT NULL, " +
                 " MESSAGE        TEXT       NOT NULL)" +
                 " CHARACTER SET  utf8mb4" +
-                " COLLATE        utf8mb4_general_ci";
+                " COLLATE        utf8mb4_unicode_520_ci";
         stmt.executeUpdate(sql);
         stmt.close();
     }
@@ -42,21 +41,26 @@ public class mySQLFile {
 
     public static void insertData(Connection c, ChatItem item, String channelID, String channelName) throws SQLException {
 
-        String date = format.format(new Date(item.getTimestamp() / 1000));
         String userID = item.getAuthorChannelID();
         String userName = item.getAuthorName();
+        String msgType = String.valueOf(item.getType());
+        String authorType = item.getAuthorType().toString();
+        String date = format.format(new Date(item.getTimestamp() / 1000));
         String msg = item.getMessage();
+
         //    System.out.println(user.getUsers().get(0).getBroadcasterType());
         //    System.out.println(user.getUsers().get(0).getType());
 
-        String sql = "INSERT INTO ChatYoutube (USERID,USERNAME,CHANNELID,CHANNELNAME,DATE,MESSAGE) VALUES (?,?,?,?,?,?);";
+        String sql = "INSERT INTO ChatYoutube (USERID,USERNAME,CHANNELID,CHANNELNAME,MESSAGETYPE,AUTHORTYPE,DATE,MESSAGE) VALUES (?,?,?,?,?,?,?,?);";
         try (PreparedStatement pstmt = c.prepareStatement(sql);) {
             pstmt.setString(1, userID);
-            pstmt.setString(2, userName);
+            pstmt.setBytes(2, userName.getBytes(StandardCharsets.UTF_8));
             pstmt.setString(3, channelID);
-            pstmt.setString(4, channelName);
-            pstmt.setString(5, date);
-            pstmt.setBytes(6, msg.getBytes(StandardCharsets.UTF_8));
+            pstmt.setBytes(4, channelName.getBytes(StandardCharsets.UTF_8));
+            pstmt.setString(5, msgType);
+            pstmt.setString(6, authorType);
+            pstmt.setString(7, date);
+            pstmt.setBytes(8, msg.getBytes(StandardCharsets.UTF_8));
 
             pstmt.executeUpdate();
         }
