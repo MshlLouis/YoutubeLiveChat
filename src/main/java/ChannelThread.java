@@ -5,9 +5,7 @@ import com.github.kusaanko.youtubelivechat.YouTubeLiveChat;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class ChannelThread implements Runnable {
 
@@ -37,11 +35,10 @@ public class ChannelThread implements Runnable {
         boolean switchedStatus = false;
         YouTubeLiveChat chat = null;
 
-
         while (true) {
             if(!isLiveB) {
                 switchedStatus = false;
-          //      System.out.println("Channel " +channelName +" is not live.");
+            //    System.out.println("Channel " +channelName +" is not live.");
                 Thread.sleep(60000);
                 isLiveB = isLive(channelID);
             }
@@ -68,7 +65,7 @@ public class ChannelThread implements Runnable {
 //                            System.out.println(delete.getMessage() + " TargetId:" + delete.getTargetId());
 //                        }
                     }  catch (Exception e) {
-                   //     System.out.println("Channel " +channelName +" just went offline!");
+                //        System.out.println("Channel " +channelName +" just went offline!");
                         isLiveB = isLive(channelID);
                     }
                     Thread.sleep(updateTimer*1000L);
