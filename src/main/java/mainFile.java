@@ -35,18 +35,17 @@ public class mainFile {
 
     public static void main(String[] args) {
 
-        /*try {
+          try {
             setCredentials();
-            Class.forName("com.mysql.cj.jdbc.Driver");
             c = DriverManager
-                    .getConnection("jdbc:mysql://"+databaseURL,
+                    .getConnection("jdbc:mariadb://"+databaseURL,
                             databaseUsername,databasePassword);
             c.setAutoCommit(false);
             System.out.println("Opened database successfully");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
-        }*/
+        }
 
         HashMap<String,Integer> channels = new HashMap<>();
 
